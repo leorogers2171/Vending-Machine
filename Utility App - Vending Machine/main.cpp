@@ -13,9 +13,6 @@
 #include <vector>
 using namespace std;
 
-//Change 1
-
-//Items
 string snacksChoc[] = {
     "Snickers", "Mars", "Twix", "Bounty", "Maltesers",
     "Aero", "Crunchie", "Dairy Milk", "Flake", "KitKat",
@@ -31,7 +28,7 @@ string drinksCans[] = {
 
 string drinksBottle[] {
     "Coke", "Fanta", "Water Bottle", "Tropicana Orange",
-    "Drench", "Dr Pepper", "Sprite"
+    "Drench", "Dr Pepper", "Sprite", "Tango"
 };
 
 string bulkCandy[] = {
@@ -39,11 +36,17 @@ string bulkCandy[] = {
 };
 
 int menuCounter = 0;
+int balance = 0;
 
 
-void DisplayMenu(string listCategory[], int arraySize, string categoryName)
+void DisplayMenu(string listCategory[], int arraySize, string categoryName, double categoryPrice)
 {
     cout << " -- " << categoryName << " -- " << endl;
+    
+    if (menuCounter != 0)
+    {
+        menuCounter = menuCounter - 1;
+    }
     
     for (int i = 0; i < arraySize; i++, menuCounter = menuCounter + 2) {
         if (i == 8 ){
@@ -58,6 +61,7 @@ void DisplayMenu(string listCategory[], int arraySize, string categoryName)
                 << right << setw(0) << (to_string(menuCounter + 2) +". " + listCategory[i + 1])
                 << '\n';
                 i = i + 1;
+                menuCounter = menuCounter + 1;
             }
         }
         else if (i > 8){
@@ -72,6 +76,7 @@ void DisplayMenu(string listCategory[], int arraySize, string categoryName)
                 << right << setw(0) << (to_string(menuCounter + 2) +". " + listCategory[i + 1])
                 << '\n';
                 i = i + 1;
+                menuCounter = menuCounter + 1;
             }
         }
         else {
@@ -89,17 +94,18 @@ void DisplayMenu(string listCategory[], int arraySize, string categoryName)
             }
         }
     }
+    cout << " -- Prices: £ " << categoryPrice << " -- " << endl;
     cout << endl;
 }
 
 
 void DisplayMenuFull() {
     cout << "* Snacks & Drinks Menu *"<< endl << endl;
-    DisplayMenu(snacksChoc, sizeof(snacksChoc)/sizeof(snacksChoc[0]), "Chocolate Bars");
-    DisplayMenu(snacksCrisps, sizeof(snacksCrisps)/sizeof(snacksCrisps[0]), "Crisps");
-    DisplayMenu(drinksCans, sizeof(drinksCans)/sizeof(drinksCans[0]), "Canned Drinks");
-    DisplayMenu(drinksBottle, sizeof(drinksBottle)/sizeof(drinksBottle[0]), "Bottled Drinks");
-    DisplayMenu(bulkCandy, sizeof(bulkCandy)/sizeof(bulkCandy[0]), "Bulk Candy");
+    DisplayMenu(snacksChoc, sizeof(snacksChoc)/sizeof(snacksChoc[0]), "Chocolate Bars", 0.80);
+    DisplayMenu(snacksCrisps, sizeof(snacksCrisps)/sizeof(snacksCrisps[0]), "Crisps", 0.80);
+    DisplayMenu(drinksCans, sizeof(drinksCans)/sizeof(drinksCans[0]), "Canned Drinks", 0.80);
+    DisplayMenu(drinksBottle, sizeof(drinksBottle)/sizeof(drinksBottle[0]), "Bottled Drinks", 1.30);
+    DisplayMenu(bulkCandy, sizeof(bulkCandy)/sizeof(bulkCandy[0]), "Bulk Candy", 1.15);
 }
 
 vector<string> combineArrays()
@@ -116,16 +122,66 @@ vector<string> combineArrays()
 
 void Instructions()
 {
+    cout << "---- Instructions ----" << endl;
     cout << "Use 'M' to view menu" << endl;
     cout << "Use 'B' to view balance" << endl;
+}
+
+void DisplayBalance()
+{
+    cout << "Your balance: £ " << balance << endl;
+}
+
+
+bool outputOptions(string userInput)
+{
+    transform(userInput.begin(), userInput.end(),userInput.begin(), ::toupper);
+    
+    if(userInput == "M")
+    {
+        DisplayMenuFull();
+        return true;
+    }
+    else if(userInput == "B")
+    {
+        DisplayBalance();
+        return true;
+    }
+    return false;
 }
 
 
 int main()
 {
-    int itemUserSelects;
+    int itemUserSelects = 0; double userBalance = 0;
     DisplayMenuFull();
-    cout << "--------------------------------------" << endl
-    << "Which item would you like to purchase? (1 - " << menuCounter << ")" <<endl;
-    cin >> itemUserSelects;
+    cout << "--------------------------------------" << endl;
+    Instructions();
+    cout << endl;
+    
+    while(true)
+    {
+        cout << "Which item would you like to purchase? (1 - " << menuCounter << ")" << endl;
+        cin >> itemUserSelects;
+        cin.clear();
+        cin.ignore(256, '\n');
+        
+        if(itemUserSelects < 1 || itemUserSelects > menuCounter && outputOptions(itemUserSelects)) == false)
+        {
+            break;
+        }
+    }
+    
+    cout << "What is your balance?" << endl << "£ ";
+    cin >> userBalance;
+    
+    
+    while (cin.fail())
+    {
+        cout << "Invalid input" << endl << endl;
+        cout << "What is your balance?" << endl << "£ ";
+        cin.clear();
+        cin.ignore(256, '\n');
+        cin >> userBalance;
+    }
 }
