@@ -17,6 +17,7 @@
 #include <string>
 #include <cstdio>
 #include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 string purchasedItem[] = {};
@@ -44,6 +45,7 @@ string bulkCandy[] = {
 };
 
 double categoryPrices[] = {0.8, 0.8, 0.8, 1.3, 1.5};
+string categoryNames[] = {"Chocolate Bars", "Crisps", "Canned Drinks", "Bottled Drinks", "Bulk Candy"};
 
 int menuCounter = 0;
 double balance = 0;
@@ -112,11 +114,11 @@ void DisplayMenu(string listCategory[], int arraySize, string categoryName, doub
 
 void DisplayMenuFull() {
     cout << "* Snacks & Drinks Menu *"<< endl << endl;
-    DisplayMenu(snacksChoc, sizeof(snacksChoc)/sizeof(snacksChoc[0]), "Chocolate Bars", 0.80);
-    DisplayMenu(snacksCrisps, sizeof(snacksCrisps)/sizeof(snacksCrisps[0]), "Crisps", 0.80);
-    DisplayMenu(drinksCans, sizeof(drinksCans)/sizeof(drinksCans[0]), "Canned Drinks", 0.80);
-    DisplayMenu(drinksBottle, sizeof(drinksBottle)/sizeof(drinksBottle[0]), "Bottled Drinks", 1.30);
-    DisplayMenu(bulkCandy, sizeof(bulkCandy)/sizeof(bulkCandy[0]), "Bulk Candy", 1.15);
+    DisplayMenu(snacksChoc, sizeof(snacksChoc)/sizeof(snacksChoc[0]), categoryNames[0], categoryPrices[0]);
+    DisplayMenu(snacksCrisps, sizeof(snacksCrisps)/sizeof(snacksCrisps[0]), categoryNames[1], categoryPrices[1]);
+    DisplayMenu(drinksCans, sizeof(drinksCans)/sizeof(drinksCans[0]), categoryNames[2], categoryPrices[2]);
+    DisplayMenu(drinksBottle, sizeof(drinksBottle)/sizeof(drinksBottle[0]), categoryNames[3], categoryPrices[3]);
+    DisplayMenu(bulkCandy, sizeof(bulkCandy)/sizeof(bulkCandy[0]), categoryNames[4], categoryPrices[4]);
 }
 
 vector<string> combineArrays()
@@ -150,11 +152,6 @@ void getNewBalance()
     cout << endl << "Choose how much to add (£)" << endl;
     cin >> balance;
     cout << endl;
-}
-
-float FloatOnePointRounded(float value)
-{
-        return ((float)((int)(value * 10))) / 10;
 }
 
 bool checkOptions(string userInput)
@@ -268,6 +265,54 @@ double getItemPrice(int itemNumber)
 }
 
 
+
+string getItemCategoryName(int itemNumber)
+{
+    int sizeOfSnacksChock = sizeof(snacksChoc)/sizeof(snacksChoc[0]),
+    sizeOfSnacksChrisps = sizeof(snacksCrisps)/sizeof(snacksCrisps[0]),
+    sizeOfDrinksCans = sizeof(drinksCans)/sizeof(drinksCans[0]),
+    sizeOfDrinksBottle = sizeof(drinksBottle)/sizeof(drinksBottle[0]),
+    sizeOfBulkCandy = sizeof(bulkCandy)/sizeof(bulkCandy[0]);
+    
+    if (itemNumber >= 0 && itemNumber < sizeOfSnacksChock)
+    {
+        //Price For Chocolate Bars
+        return categoryNames[0];
+    }
+    
+    else if(itemNumber >= sizeOfSnacksChock && (itemNumber < sizeOfSnacksChock + sizeOfSnacksChrisps))
+    {
+        //Price For Crisps
+        return categoryNames[1];
+    }
+    
+    else if (itemNumber >= sizeOfSnacksChock + sizeOfSnacksChrisps && (itemNumber < sizeOfSnacksChock + sizeOfSnacksChrisps + sizeOfDrinksCans))
+    {
+        //Price For Drinks Cans
+        return categoryNames[2];
+    }
+    
+    else if (itemNumber >= sizeOfSnacksChock + sizeOfSnacksChrisps + sizeOfDrinksCans && (itemNumber < sizeOfSnacksChock + sizeOfSnacksChrisps + sizeOfDrinksCans + sizeOfDrinksBottle))
+    {
+        //Price For Drinks Bottles
+        return categoryNames[3];
+    }
+    
+    else if (itemNumber >= sizeOfSnacksChock + sizeOfSnacksChrisps + sizeOfDrinksCans + sizeOfDrinksBottle && (itemNumber < sizeOfSnacksChock + sizeOfSnacksChrisps + sizeOfDrinksCans + sizeOfDrinksBottle + sizeOfBulkCandy))
+    {
+        //Price For Bulk Candy
+        return categoryNames[4];
+    }
+
+    else
+    {
+        return 0;
+    }
+}
+
+
+
+
 void selectedItem(int itemNumber)
 {
     double tempBalance = (balance - (getItemPrice(itemNumber-1)));
@@ -298,9 +343,63 @@ bool CheckBalance(int itemNumber)
     else {return true;}
 }
 
-void suggestItem(int itemNumber)
+vector <string> purchasedItems;
+vector <string> suggestedItems;
+
+string suggestedItemIteration(string arrayToSuggest[])
 {
+    string suggestedItemTemp;
+    while (true)
+    {
+        //If the randomly selected item in the last two places of the vector dosen't equal the random selection then break the array.
+        if (suggestedItems[suggestedItems.size()-1] != suggestedItemTemp || suggestedItems[suggestedItems.size()-2] != suggestedItemTemp)
+        {
+            break;
+        }
+        else
+        {
+            //Random Item in Canned Drinks Array
+            int RandIndex = rand() % (sizeof(arrayToSuggest) / sizeof(arrayToSuggest[0]) -1 );
+            return arrayToSuggest[RandIndex];
+        }
+    }
+    return "";
+}
+
+
+string suggestItem(string itemName, string itemCategory)
+{
+    string suggestedItem, suggestedItemTemp;
     
+    purchasedItems.push_back(itemName);
+    
+    //Checking Category Choc Bars Or Crisps
+    if (itemCategory == categoryNames[0] || itemCategory == categoryNames[1])
+    {
+        suggestedItemTemp = suggestedItemIteration(drinksCans);
+    }
+    
+    //Checking Category Drink Cans or Drink Bottles
+    else if (itemCategory == categoryNames[2] || itemCategory == categoryNames[3])
+    {
+        // If category is drink cans
+        if (itemCategory == categoryNames[2]) {
+            suggestedItemTemp = suggestedItemIteration(snacksChoc);
+        }
+        
+        //If category is drink bottles
+        else if (itemCategory == categoryNames[3]) {
+            suggestedItemTemp = suggestedItemIteration(bulkCandy);
+        }
+    }
+    
+    else if (itemCategory == categoryNames[4])
+    {
+        suggestedItemTemp = suggestedItemIteration(drinksBottle);
+    }
+    
+    purchasedItems.push_back(suggestedItem);
+    return suggestedItem;
 }
 
 
@@ -326,10 +425,11 @@ int main()
             break;
         }
         
-//        if(itemSelected == true)
-//        {
-//            suggestItem(stoi(itemUserSelects));
-//        }
+        if(itemSelected == true)
+        {
+            cout << "We have suggested" <<
+            suggestItem((combineArrays()[stoi(itemUserSelects)]), (getItemCategoryName(stoi(itemUserSelects))));
+        }
         
         if(isNumber(itemUserSelects))
         {
